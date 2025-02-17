@@ -13,14 +13,14 @@ class SimpleGemini
 		string $project,
 		string $location,
 		string $model,
+		?array $generationConfig = null,
 		?array $safetySettings = null,
-		?array $generationConfig = null
 	)
 	{
-		$this->client = new GeminiClient($googleCredentialsPath, $project, $location, $model, $safetySettings, $generationConfig);
+		$this->client = new GeminiClient($googleCredentialsPath, $project, $location, $model, $generationConfig, $safetySettings);
 	}
 
-	public function prompt(string $prompt): array
+	public function prompt(string $prompt): string
 	{
 		try {
 			return $this->client->sendPrompt($prompt);

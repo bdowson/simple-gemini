@@ -3,6 +3,7 @@
 namespace SimpleGemini;
 
 use Google\Auth\Credentials\ServiceAccountCredentials;
+use Google\Cloud\AIPlatform\V1\Client\PredictionServiceClient;
 use GuzzleHttp\Client;
 use SimpleGemini\Exceptions\SimpleGeminiException;
 
@@ -10,7 +11,6 @@ class GeminiClient
 {
 	private string $accessToken;
 	private Client $httpClient;
-	private string $project;
 	private string $location;
 	private string $model;
 	private ?array $safetySettings;
@@ -21,13 +21,11 @@ class GeminiClient
 		string $project,
 		string $location,
 		string $model,
+		?array $generationConfig = null,
 		?array $safetySettings = null,
-		?array $generationConfig = null
 	)
 	{
-		$this->project = $project;
 		$this->location = $location;
-		$this->model = $model;
 		$this->safetySettings = $safetySettings;
 		$this->generationConfig = $generationConfig;
 
@@ -35,11 +33,18 @@ class GeminiClient
 		$credentials = new ServiceAccountCredentials($scopes, $googleCredentialsPath);
 		$this->accessToken = $credentials->fetchAuthToken()['access_token'];
 		$this->httpClient = new Client();
+
+		$this->model = PredictionServiceClient::projectLocationPublisherModelName(
+			$project,
+			$location,
+			'google',
+			$model
+		);
 	}
 
-	public function sendPrompt(string $prompt): array
+	public function sendPrompt(string $prompt): string
 	{
-		$endpoint = "https://{$this->location}-aiplatform.googleapis.com/v1/projects/{$this->project}/locations/{$this->location}/publishers/google/models/{$this->model}:generateContent";
+		$endpoint = "https://{$this->location}-aiplatform.googleapis.com/v1/{$this->model}:generateContent";
 
 		$requestBody = [
 			'contents' => [
@@ -56,30 +61,29 @@ class GeminiClient
 
 		if ($this->generationConfig) {
 			$requestBody['generationConfig'] = $this->generationConfig;
-		} else {
+		}
+
+		if(empty($requestBody['generationConfig']['maxOutputTokens'])) {
 			$requestBody['generationConfig'] = [
-				'temperature' => 1,
-    			'maxOutputTokens' => 8000,
-				'responseMimeType' => 'application/json',
+				'maxOutputTokens' => 8000,
 			];
 		}
 
 		try {
 			$response = $this->httpClient->post($endpoint, [
 				'headers' => [
-					'Authorization' => 'Bearer {$this->accessToken}',
+					'Authorization' => "Bearer {$this->accessToken}",
 					'Content-Type' => 'application/json',
 				],
 				'json' => $requestBody,
 			]);
 
 			$responseBody = json_decode($response->getBody()->getContents(), true);
-
 			if (empty($responseBody['candidates'][0]['content']['parts'][0]['text'])) {
 				throw new SimpleGeminiException('Empty response from Gemini AI.');
 			}
 
-			return json_decode($responseBody['candidates'][0]['content']['parts'][0]['text'], true);
+			return $responseBody['candidates'][0]['content']['parts'][0]['text'];
 		} catch (\Throwable $e) {
 			throw new SimpleGeminiException('API request failed: ' . $e->getMessage());
 		}
