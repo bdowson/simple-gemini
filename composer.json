@@ -1,0 +1,37 @@
+{
+	"name": "bdowson/simple-gemini",
+	"description": "A lightweight PHP package to send prompts to Google's Gemini AI and retrieve responses.",
+	"type": "library",
+	"keywords": ["gemini", "google-ai", "llm", "ai", "php", "api"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Ben Dowson",
+			"email": "your-email@example.com",
+			"homepage": "https://github.com/bdowson"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"SimpleGemini\\": "src/"
+		}
+	},
+	"require": {
+		"php": "^8.0",
+		"guzzlehttp/guzzle": "^7.0",
+		"google/auth": "^1.23",
+		"google/cloud-aiplatform": "^0.10"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.0",
+		"vlucas/phpdotenv": "^5.5"
+	},
+	"scripts": {
+		"test": "vendor/bin/phpunit"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-main": "1.x-dev"
+		}
+	}
+}
