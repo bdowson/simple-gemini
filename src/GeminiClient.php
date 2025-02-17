@@ -1,11 +1,11 @@
 <?php
 
-namespace SimpleGemini;
+namespace Bdowson\SimpleGemini;
 
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Cloud\AIPlatform\V1\Client\PredictionServiceClient;
 use GuzzleHttp\Client;
-use SimpleGemini\Exceptions\SimpleGeminiException;
+use Bdowson\SimpleGemini\Exceptions\SimpleGeminiException;
 
 class GeminiClient
 {

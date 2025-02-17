@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleGemini\Exceptions;
+namespace Bdowson\SimpleGemini\Exceptions;
 
 use Exception;
 

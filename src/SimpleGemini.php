@@ -1,8 +1,8 @@
 <?php
 
-namespace SimpleGemini;
+namespace Bdowson\SimpleGemini;
 
-use SimpleGemini\Exceptions\SimpleGeminiException;
+use Bdowson\SimpleGemini\Exceptions\SimpleGeminiException;
 
 class SimpleGemini
 {
